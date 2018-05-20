@@ -16,8 +16,9 @@ file = open("receive_output", "w")
 
 # callback function
 def callback(ch, method, properties, body):
-    print(" [x] Received %r" % body)
-    file.write(" [x] Received %r" % body)
+##	if "ECZDA" in
+    print("%s" % body)
+    file.write("%s" % body + "\n")
 
 
 # receive from queue

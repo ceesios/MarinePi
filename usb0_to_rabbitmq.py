@@ -11,6 +11,9 @@ addr = "/dev/ttyUSB0" ## serial port to read data from
 baud = 38400 ## baud rate for instrument
 filename = "/var/tmp/usb0.out"
 
+ingnoredsentences = ["DUAIQ", "ECDTM", "ECGGA", "ECGLL", "ECGSA", "ECGSV", "ECRMC", "ECVTG", "ECZDA", "SDDBT", "SDDPT"]
+
+
 mquser = "nimmerzat"
 mqpass = "Naceo1oh"
 mqserver = "mqtt.cmoerkerken.nl"
@@ -51,14 +54,18 @@ while True:
             joined_seq = ''.join(str(v) for v in seq) ## Make a string from array
 
         if i == '\n':
-            ## assemble message,  append a timestamp to each row of data
-            data=(str(count) + "," + str(datetime.datetime.now()) + "," + joined_seq)
-            ## reset the seq
-            seq = []
-            ## up the rowcount
-            count += 1
-            ## publish message
-            channel.basic_publish(exchange='',routing_key=mqqueuename,body=data)
+            if any(x in joined_seq for x in ingnoredsentences):
+                ## reset the seq
+                seq = []
+            else:
+                ## assemble message,  append a timestamp to each row of data
+                data=(str(count) + "," + str(datetime.datetime.now()) + "," + joined_seq)
+                ## reset the seq
+                seq = []
+                ## up the rowcount
+                count += 1
+                ## publish message
+                channel.basic_publish(exchange='',routing_key=mqqueuename,body=data)
 
             break
 
