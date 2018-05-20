@@ -7,8 +7,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-addr = "/dev/ttyUSB0" ## serial port to read data from
-baud = 38400 ## baud rate for instrument
+addr = "/dev/pts/2" ## serial port to read data from
+baud = 9600 ## baud rate for instrument
 filename = "/var/tmp/usb0.out"
 
 mquser = "nimmerzat"
@@ -46,26 +46,20 @@ count = 1 ## row index
 while True:
     for i in ser.read():
         seq.append(i) ## convert from ACSII?
-        #if (i != '\n') and (i != '\r'):
-        if i not in ['\n', '\r']:
-            joined_seq = ''.join(str(v) for v in seq) ## Make a string from array
+        joined_seq = ''.join(str(v) for v in seq) ## Make a string from array
 
         if i == '\n':
-            ## assemble message,  append a timestamp to each row of data
-            data=(str(count) + "," + str(datetime.datetime.now()) + "," + joined_seq)
-            ## reset the seq
+            data=(str(count) + "," + str(datetime.datetime.now()) + "," + joined_seq) ## append a timestamp to each row of data
             seq = []
-            ## up the rowcount
             count += 1
             ## publish message
             channel.basic_publish(exchange='',routing_key=mqqueuename,body=data)
-
             break
 
 
 ## close connection
 connection.close()
 
-#print(" [x] Sent 'Hello World!'")
+print(" [x] Sent 'Hello World!'")
 
 

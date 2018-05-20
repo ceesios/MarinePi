@@ -3,7 +3,7 @@
 # echo2.py
 # loop over nmea example data
 # sould be used with socat:
-# socat -ddd -ddd PTY,raw,echo=0 "EXEC:'python ./echo2.py',pty,raw,echo=0"
+# socat -ddd -ddd PTY,raw,echo=0 "EXEC:'python ./echo_lines.py',pty,raw,echo=0"
 import time
 
 filename = "./nmea_sample_data/valid_nmea"

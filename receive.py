@@ -1,30 +1,28 @@
 #!/usr/bin/python
 
-import time, pika
+import time, pika, os
 
-mquser = "nimmerzat"
-mqpass = "Naceo1oh"
-mqserver = "mqtt.cmoerkerken.nl"
-mqport = 5672
-mqqueuename = "nimmerzat"
+credentials = pika.PlainCredentials(os.environ['MQ_USER'], os.environ['MQ_PASS'])
+parameters = pika.ConnectionParameters(os.environ['MQ_SERVER'],int(os.environ['MQ_PORT']),'/',credentials)
 
-credentials = pika.PlainCredentials(mquser, mqpass)
-parameters = pika.ConnectionParameters(mqserver,mqport,'/',credentials)
-
-# Connect
+## Connect
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
-# declare the que (idempotent)
-channel.queue_declare(queue=mqqueuename)
+## declare the que (idempotent)
+channel.queue_declare(queue=os.environ['MQ_QUEUENAME'])
+
+file = open("receive_output", "w")
 
 # callback function
 def callback(ch, method, properties, body):
     print(" [x] Received %r" % body)
+    file.write(" [x] Received %r" % body)
+
 
 # receive from queue
 channel.basic_consume(callback,
-                      queue=mqqueuename,
+                      queue=os.environ['MQ_QUEUENAME'],
                       no_ack=True)
 
 print(' [*] Waiting for messages. To exit press CTRL+C')
@@ -32,6 +30,6 @@ channel.start_consuming()
 
 # close connection
 connection.close()
-
+file.close()
 
 

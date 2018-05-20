@@ -8,12 +8,6 @@ addr = "/dev/pts/2" ## serial port to read data from
 baud = 9600 ## baud rate for instrument
 filename = "/var/tmp/usb0.out"
 
-mquser = "nimmerzat"
-mqpass = "Naceo1oh"
-mqserver = "mqtt.cmoerkerken.nl"
-mqport = 5672
-mqque = "nimmerzat"
-
 ser = serial.Serial(
     port = addr,\
     baudrate = baud,\
