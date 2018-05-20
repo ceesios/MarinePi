@@ -59,7 +59,7 @@ while True:
                 ## up the rowcount
                 count += 1
                 ## publish message
-                channel.basic_publish(exchange='',routing_key=mqqueuename,body=data)
+                channel.basic_publish(exchange='',routing_key=os.environ['MQ_QUEUENAME'],body=data)
 
             break
 
