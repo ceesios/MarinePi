@@ -48,8 +48,8 @@ def consumer_callback(ch, method, properties, body):
     cursor.execute('INSERT INTO nmea_raw_data(datetime, messagetype, f1, f2, f3, f4, f5, f6, f7, f8 ) \
         VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', 
         (datetimestripped, messagetype, fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], fields[9], fields[10]))
-    if "noack" not in properties:
-        db.commit()
+#    if "noack" not in properties:
+#        db.commit()
 
 
 ## argument is given, process as log file
