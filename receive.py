@@ -20,8 +20,9 @@ channel.queue_declare(queue=os.environ['MQ_QUEUENAME'])
 
 ###################
 ## Connect to MySQL
-db = MySQLdb.connect(host=os.environ['SQL_SERVER'],    # your host, usually localhost
-                     user=os.environ['SQL_USER'],         # your username
+db = MySQLdb.connect(host=os.environ['SQL_SERVER'],  # your host, usually localhost
+                     user=os.environ['SQL_USER'],    # your username
+                     port=int(os.environ['SQL_PORT']),    # port
                      passwd=os.environ['SQL_PASS'],  # your password
                      db=os.environ['SQL_DB'])        # name of the data base
 
@@ -34,7 +35,7 @@ def consumer_callback(ch, method, properties, body):
     ## print rabbitmq message on screen
     print("%s" % body)
     ## write rabbitmq message to file
-    file = open("receive_output", "a")
+    file = open("/var/log/receive_output", "a")
     file.write("%s" % body + "\n")
     file.close()
 
@@ -48,8 +49,17 @@ def consumer_callback(ch, method, properties, body):
     cursor.execute('INSERT INTO nmea_raw_data(datetime, messagetype, f1, f2, f3, f4, f5, f6, f7, f8 ) \
         VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', 
         (datetimestripped, messagetype, fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], fields[9], fields[10]))
-#    if "noack" not in properties:
-#        db.commit()
+
+#    print(type(properties))
+#    print(properties)
+
+#    if isinstance(properties, str) is True:
+#        if "noack" not in properties:
+#            db.commit()
+#       print("commit")
+#        else:
+#            print("noack is set")
+    db.commit()
 
 
 ## argument is given, process as log file
@@ -64,7 +74,8 @@ else:
     # receive from queue
     channel.basic_consume(consumer_callback,
                           queue=os.environ['MQ_QUEUENAME'],
-                          no_ack=True)
+                          no_ack=True,
+                          exclusive=False, consumer_tag=None, arguments=None)
 
     db.commit()
     print(' [*] Waiting for messages. To exit press CTRL+C')
